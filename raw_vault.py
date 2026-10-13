@@ -13,6 +13,7 @@ import base64, hashlib, json, os, secrets, sys
 from datetime import datetime, timezone
 from pathlib import Path
 
+from cryptography.exceptions import InvalidTag
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 from cryptography.hazmat.primitives.kdf.hkdf import HKDF
@@ -67,7 +68,10 @@ def load_dek(vault, today=None):
     for month in (today, previous(today)):
         f = vault / "wraps" / f"wrap-{month}.json"
         if f.exists():
-            return unseal(month_key(month), unb64(json.loads(f.read_text())["wrapped"]), month.encode())
+            try:
+                return unseal(month_key(month), unb64(json.loads(f.read_text())["wrapped"]), month.encode())
+            except InvalidTag:
+                raise SystemExit("This VAULT_MASTER is not the key this vault was made with. Use the original key, or, if it is lost, delete the vault folder and encrypt again with a new key (and set the same key as the Actions secret).")
     raise SystemExit("No usable wrap for this month or last month. Run wrap with the key that made the vault.")
 
 

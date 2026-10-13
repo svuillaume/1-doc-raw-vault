@@ -81,3 +81,12 @@ def test_an_openssl_hex_secret_works_as_master(tmp_path, monkeypatch):
     v.encrypt(tmp_path / "raw", tmp_path / "vault", "2026-10")
     v.decrypt(tmp_path / "vault", tmp_path / "out", "2026-10")
     assert (tmp_path / "out" / "a.txt").read_text() == "hello"
+
+
+def test_a_different_master_than_the_vault_was_made_with_gives_a_clear_message(tmp_path, monkeypatch):
+    tree(tmp_path / "raw", {"a.txt": "x"})
+    v.encrypt(tmp_path / "raw", tmp_path / "vault", "2026-10")
+    monkeypatch.setenv("VAULT_MASTER", v.b64(os.urandom(32)))
+    with pytest.raises(SystemExit) as e:
+        v.encrypt(tmp_path / "raw", tmp_path / "vault", "2026-10")
+    assert "not the key this vault was made with" in str(e.value)
