@@ -73,3 +73,11 @@ def test_a_typed_phrase_as_master_is_refused_with_a_clear_message(tmp_path, monk
     with pytest.raises(SystemExit) as e:
         v.encrypt(tmp_path / "raw", tmp_path / "vault", "2026-10")
     assert "genmaster" in str(e.value)
+
+
+def test_an_openssl_hex_secret_works_as_master(tmp_path, monkeypatch):
+    monkeypatch.setenv("VAULT_MASTER", os.urandom(32).hex())
+    tree(tmp_path / "raw", {"a.txt": "hello"})
+    v.encrypt(tmp_path / "raw", tmp_path / "vault", "2026-10")
+    v.decrypt(tmp_path / "vault", tmp_path / "out", "2026-10")
+    assert (tmp_path / "out" / "a.txt").read_text() == "hello"

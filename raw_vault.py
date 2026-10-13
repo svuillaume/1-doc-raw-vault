@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Encrypted copy of 1-doc's raw/ folder, safe to keep in a PRIVATE git repo. Nothing readable ever leaves your machine.
 
-  VAULT_MASTER=<base64 secret> raw_vault.py genmaster            print a new master secret (keep it out of git)
+  raw_vault.py genmaster   (or: openssl rand -hex 32)            print a new master secret (keep it out of git)
   VAULT_MASTER=... raw_vault.py encrypt RAW_DIR VAULT_DIR        encrypt new or changed files (unchanged files keep their bytes)
   VAULT_MASTER=... raw_vault.py wrap VAULT_DIR [--month YYYY-MM] re-wrap the data key for this month (run monthly)
   VAULT_MASTER=... raw_vault.py decrypt VAULT_DIR OUT_DIR        restore the files
@@ -39,7 +39,7 @@ def master():
     except ValueError:
         key = b""
     if len(key) < 32:
-        sys.exit("VAULT_MASTER must be a generated key, not a typed phrase: run genmaster and use what it prints.")
+        sys.exit("VAULT_MASTER must be a generated key, not a typed phrase: run genmaster (or openssl rand -hex 32) and use what it prints.")
     return key
 
 
