@@ -1,0 +1,25 @@
+# Monthly key rotation: re-wrap the data key with the new month's key. Only a tiny file in wraps/ changes.
+name: rewrap
+on:
+  schedule:
+    - cron: "0 3 1 * *"
+  workflow_dispatch: {}
+permissions:
+  contents: write
+jobs:
+  rewrap:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install cryptography
+      - run: python raw_vault.py wrap vault
+        env:
+          VAULT_MASTER: ${{ secrets.VAULT_MASTER }}
+      - run: |
+          git config user.name "vault-bot"
+          git config user.email "vault-bot@users.noreply.github.com"
+          git add vault
+          git diff --cached --quiet || git commit -m "Rotate the monthly key" && git push
