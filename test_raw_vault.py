@@ -65,3 +65,11 @@ def test_wrong_master_and_a_missed_month_are_refused(tmp_path, monkeypatch):
 
 def test_january_wraps_back_to_december():
     assert v.previous("2027-01") == "2026-12" and v.previous("2026-10") == "2026-09"
+
+
+def test_a_typed_phrase_as_master_is_refused_with_a_clear_message(tmp_path, monkeypatch):
+    monkeypatch.setenv("VAULT_MASTER", "thisis%&mypassphrase1^")
+    tree(tmp_path / "raw", {"a.txt": "x"})
+    with pytest.raises(SystemExit) as e:
+        v.encrypt(tmp_path / "raw", tmp_path / "vault", "2026-10")
+    assert "genmaster" in str(e.value)

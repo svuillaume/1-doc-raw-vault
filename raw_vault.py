@@ -34,9 +34,12 @@ def master():
     raw = os.environ.get("VAULT_MASTER", "")
     if not raw:
         sys.exit("Set VAULT_MASTER (see genmaster). It is never stored in the vault.")
-    key = unb64(raw)
+    try:
+        key = unb64(raw)
+    except ValueError:
+        key = b""
     if len(key) < 32:
-        sys.exit("VAULT_MASTER is too short: use genmaster.")
+        sys.exit("VAULT_MASTER must be a generated key, not a typed phrase: run genmaster and use what it prints.")
     return key
 
 
