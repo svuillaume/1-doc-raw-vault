@@ -10,3 +10,15 @@ An encrypted copy of 1-doc's `raw/` folder, meant for a **private** git repo. Gi
 - **Tests:** `python -m pytest -q`.
 
 Not part of the Chrome plugin yet.
+
+- ** git add vault && git commit -m "Add encrypted raw sources" && git push **
+
+```
+Use genmster or openssl rand -hex 32
+
+cd ~/tmp/personal_project/new_wiki/raw-vault
+export VAULT_MASTER=‘$VAULT_MASRTER’
+../llm_wiki/venv/bin/python raw_vault.py encrypt ../llm_wiki/raw vault
+git add vault && git commit -m "Add encrypted raw sources" && git push
+
+```
