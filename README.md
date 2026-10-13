@@ -14,7 +14,7 @@ Not part of the Chrome plugin yet.
 - ** git add vault && git commit -m "Add encrypted raw sources" && git push **
 
 ```
-Use genmster or openssl rand -hex 32
+Use genmster or openssl rand -hex 32 to update VAULT_KEY
 
 cd ~/tmp/personal_project/new_wiki/raw-vault
 export VAULT_MASTER=‘$VAULT_MASRTER’
