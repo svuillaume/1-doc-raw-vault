@@ -59,7 +59,7 @@ def test_wrong_master_and_a_missed_month_are_refused(tmp_path, monkeypatch):
     with pytest.raises(SystemExit):   # wraps older than last month are not accepted
         v.decrypt(vault, tmp_path / "o", "2026-12")
     monkeypatch.setenv("VAULT_MASTER", v.b64(os.urandom(32)))
-    with pytest.raises(Exception):
+    with pytest.raises(SystemExit):
         v.decrypt(vault, tmp_path / "o2", "2026-10")
 
 
@@ -90,3 +90,12 @@ def test_a_different_master_than_the_vault_was_made_with_gives_a_clear_message(t
     with pytest.raises(SystemExit) as e:
         v.encrypt(tmp_path / "raw", tmp_path / "vault", "2026-10")
     assert "not the key this vault was made with" in str(e.value)
+
+
+def test_wrap_twice_in_the_same_month_changes_nothing(tmp_path):
+    tree(tmp_path / "raw", {"a.txt": "x"})
+    vault = tmp_path / "vault"
+    v.encrypt(tmp_path / "raw", vault, "2026-10")
+    before = (vault / "wraps" / "wrap-2026-10.json").read_bytes()
+    v.wrap(vault, "2026-10")
+    assert (vault / "wraps" / "wrap-2026-10.json").read_bytes() == before

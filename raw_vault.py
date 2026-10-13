@@ -78,7 +78,8 @@ def load_dek(vault, today=None):
 def wrap(vault, month=None):
     month = month or this_month()
     dek = load_dek(vault, month)
-    write_wrap(vault, dek, month)
+    if not (vault / "wraps" / f"wrap-{month}.json").exists():   # this month's wrap is already there: leave it, so a re-run changes nothing
+        write_wrap(vault, dek, month)
     for f in (vault / "wraps").glob("wrap-*.json"):
         if f.stem[5:] not in (month, previous(month)):
             f.unlink()
